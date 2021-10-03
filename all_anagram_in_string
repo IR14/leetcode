@@ -1,0 +1,63 @@
+# https://leetcode.com/problems/find-all-anagrams-in-a-string/
+# Asked at Yandex interview in the algorithmic section
+
+# O(n) solution. Dicts and optimizing dicts comparison O(n) to O(1) by counter
+def findAnagrams(s: str, p: str) -> List[int]:
+  result = []
+  n = len(s)
+  m = len(p)
+
+  if n == 0 or m == 0 or n < m:
+    return result
+
+  from collections import defaultdict
+  ds = defaultdict(int)
+  count = m
+
+  for char in p:
+    ds[char] += 1
+
+  for _, char in enumerate(s[:m]):
+    ds[char] -= 1
+    if ds[char] >= 0:
+      count -= 1
+
+  if count == 0: result.append(0)
+
+  for i, char in enumerate(s[m:]):
+    ds[s[i]] += 1
+    if ds[s[i]] > 0:
+      count += 1
+
+    ds[char] -= 1
+    if ds[char] >= 0:
+      count -= 1
+
+    if count == 0: result.append(i + 1)
+
+  return result
+
+# O(n) solution. Sum of hash values. Remember about Hash collisions! https://en.wikipedia.org/wiki/Hash_collision 
+def findAnagrams(s: str, p: str) -> List[int]:
+  result = []
+  n = len(s)
+  m = len(p)
+  
+  if n == 0 or m == 0 or n < m:
+    return result
+
+  patternHash = sum(hash(char) for char in p)
+  currentHash = 0
+
+  for char in s[:m]:
+      currentHash += hash(char)
+
+  if currentHash == patternHash:
+      result.append(0)
+
+  for i, char in enumerate(s[m:]):
+      currentHash += hash(char) - hash(s[i])
+      if currentHash == patternHash:
+          result.append(i + 1)
+
+  return result 
